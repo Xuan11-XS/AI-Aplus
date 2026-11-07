@@ -1,4 +1,5 @@
 build/
+package/
 workspace/main
 workspace/*.exe
 workspace/.aplus-run-*
