@@ -56,6 +56,20 @@ C:/Qt/6.x.y/mingw_64/bin/windeployqt.exe build/aplus.exe
 
 MinGW 套件自带 `g++`，Aplus 编译你写的代码用的就是它。
 
+这条路实际走通过：Qt 6.11.2（`C:/Qt/6.11.2/mingw_64`）+ 自带 MinGW 13.1 + 自带 Ninja/CMake，
+用下面的命令能直接编出 `build/aplus.exe`，`ctest` 也过：
+
+```bat
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release ^
+  -DCMAKE_PREFIX_PATH=C:/Qt/6.11.2/mingw_64 ^
+  -DCMAKE_MAKE_PROGRAM=C:/Qt/Tools/Ninja/ninja.exe
+cmake --build build
+ctest --test-dir build --output-on-failure
+```
+
+注意 MinGW 的 `bin` 要进 PATH：`g++.exe` 本身能找到还不够，它拉起来的 `cc1plus.exe`
+要靠 PATH 找 `libgmp` 这些 DLL，缺了会静默失败。
+
 ## 让 Aplus 找到 g++
 
 Aplus 本身不需要装编译器，它调用 PATH 里的 `g++`：
@@ -69,12 +83,27 @@ Aplus 本身不需要装编译器，它调用 PATH 里的 `g++`：
 右键 `aplus.exe` → 发送到 → 桌面快捷方式。然后把快捷方式的属性里
 “起始位置(Start in)”改成项目根目录，`workspace/` 就在它下面。
 
+## 独立控制台
+
+运行菜单里的“在独立控制台中运行”在 Windows 上是有的：Aplus 用 PowerShell 开一个
+新控制台窗口跑你的程序，和 Dev-C++ 的控制台一个用法。
+
+- 程序在控制台窗口里可以直接读键盘，交互输入不用先填“程序输入”；
+- 窗口里会打出退出码和耗时，停在“按任意键关闭窗口...”；
+- Ctrl+F2 停止：Aplus 按 pid 结束程序，窗口留着打完收尾信息；
+- Ctrl+C 只打断你的程序，不会把壳进程一起带走。
+
+前提是系统里有 Windows PowerShell（Windows 10/11 自带，
+`%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe`）。找不到时会退回底部内嵌输出，
+菜单项变灰，鼠标悬停能看到原因。
+
 ## 和 Linux 版的差别
 
-- 独立控制台目前是 Linux 的方案（GNOME Console 等终端模拟器）；
-  Windows 上会自动退回底部内嵌输出，运行菜单里的“在独立控制台中运行”会变灰。
-  F9/F10/F11、时间限制、停止、编译错误跳转、`Ctrl+滚轮`、图标这些都一样。
-- 想补 Windows 的 cmd/PowerShell 控制台，在一台 Windows 上做并测试即可。
+- F9/F10/F11、时间限制、停止、编译错误跳转、`Ctrl+滚轮`、图标这些都一样。
+- 独立控制台：Linux 调 GNOME Console / konsole 等终端模拟器，
+  Windows 调 PowerShell 开 `powershell.exe` 控制台窗口，跑的是同一套“壳脚本 + status 文件”协议
+  （`src/consolerunner.cpp`，Linux 写 `run.sh`，Windows 写 `run.ps1`）。
+- 控制台模式目前和 Linux 一样不套时间限制；要测时限用内嵌输出（F10）。
 
 ## 注意
 

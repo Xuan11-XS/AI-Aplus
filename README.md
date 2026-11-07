@@ -69,11 +69,11 @@ GXX=/path/to/g++ ./build/aplus
 ## 编译成 Windows exe
 
 代码是跨平台的，Windows 上重新编译一遍即可，不用改源码。完整步骤见
-[docs/WINDOWS.md](docs/WINDOWS.md)：推荐装 MSYS2（UCRT64），两条命令编译，
-`windeployqt` 打包，产物是 `build/aplus.exe`。
+[docs/WINDOWS.md](docs/WINDOWS.md)：装 MSYS2（UCRT64）或者 Qt 官方安装器的 MinGW 套件，
+两条命令编译，`windeployqt` 打包，产物是 `build/aplus.exe`。
 
-目前唯一的差别：独立控制台是 Linux 的终端方案，Windows 版会退回底部内嵌输出，
-其余功能（F9/F10/F11、时间限制、错误跳转、Ctrl+滚轮、图标）完全一致。
+Windows 版功能是齐的：独立控制台用 PowerShell 开一个新的控制台窗口跑程序，
+F9/F10/F11、时间限制、错误跳转、Ctrl+滚轮、图标都一样。
 
 ## 使用
 
@@ -130,7 +130,8 @@ ctest --test-dir build --output-on-failure
 
 ## 说明
 
-- 独立控制台目前使用 Linux 的 GNOME Console / 其他终端模拟器；Windows 版会回退到内嵌输出，等有 Windows 环境再补 `cmd` 控制台。
+- 独立控制台：Linux 用 GNOME Console / 其他终端模拟器，Windows 用 PowerShell 开控制台窗口；
+  两边都是“壳脚本 + status 文件”的同一套做法。找不到可用终端时回退到内嵌输出。
 - 没有调试器，按你的要求先不做。
 - 一次编译一个源文件，没有多文件项目。
 - 编译错误信息是英文（编译时设置了 `LC_ALL=C`），和 OJ 一致。

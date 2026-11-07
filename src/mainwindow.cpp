@@ -524,7 +524,7 @@ void MainWindow::loadSettings()
     m_consoleAction->setEnabled(consoleAvailable);
     if (!consoleAvailable) {
 #ifdef Q_OS_WIN
-        m_consoleAction->setToolTip(tr("Windows 版暂未实现独立控制台，运行会退回内嵌输出"));
+        m_consoleAction->setToolTip(tr("没有找到 PowerShell，运行会退回内嵌输出"));
 #else
         m_consoleAction->setToolTip(tr("未找到可用的终端模拟器（kgx / gnome-terminal / konsole / xfce4-terminal）"));
 #endif
