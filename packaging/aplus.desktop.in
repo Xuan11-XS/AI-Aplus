@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Aplus
+GenericName=C++ Editor
+GenericName[zh_CN]=C++ 编辑器
+Comment=Small C++ editor for competitive programming
+Comment[zh_CN]=面向算法竞赛的简单 C++ 编辑器
+Exec=@ROOT@/build/aplus
+Path=@ROOT@
+Icon=@ROOT@/assets/aplus.png
+Terminal=false
+Categories=Development;IDE;Utility;TextEditor;
+Keywords=C++;cpp;editor;IDE;algorithm;
+StartupNotify=true
+StartupWMClass=Aplus
