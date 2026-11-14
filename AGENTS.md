@@ -62,7 +62,7 @@ export https_proxy=http://127.0.0.1:7897 http_proxy=http://127.0.0.1:7897
 
 - ✅ 已做：编辑器、编译运行、时间限制、编译错误双击跳转、独立控制台（kgx/GNOME Console）、Ctrl+滚轮缩放、应用图标、GNOME 快捷方式；源码已推公开仓库，简介与 README 开头署 DeepSeek AI。
 - ✅ 已做（2026-11-08，Windows）：用 Qt 官方 MinGW 套件编出 `build/aplus.exe`，`ctest` 全过；独立控制台补上 Windows 版——PowerShell 开新控制台窗口跑程序，交互输入可用，Ctrl+C 只打断程序，Ctrl+F2 按 pid 文件结束程序，窗口留着打收尾信息。冒烟验证过编译运行、退出码、超时、停止、控制台关窗。
-- ✅ 已做（2026-11-14）：合并 Windows 两笔提交（PowerShell 独立控制台、便携打包脚本，见 docs/WINDOWS.md）；新增“题目”标签页——洛谷/CF 题面+样例获取（洛谷 JSON 接口被风控时自动退回页面内嵌 lentille JSON）、样例一键填入、按题号建文件；新增 docs/UBUNTU.md。
+- ✅ 已做（2026-11-14）：合并 Windows 两笔提交（PowerShell 独立控制台、便携打包脚本，见 docs/WINDOWS.md）；新增“题目”标签页——洛谷/CF 题面+样例获取（洛谷 JSON 接口被风控时自动退回页面内嵌 lentille JSON）、样例一键填入、按题号建文件；新增 docs/UBUNTU.md；新增 aplus.sh 一键启动脚本（检测依赖/自动安装/编译/测试/快捷方式）。
 - 💡 计划（用户感兴趣）：本地对拍 → CF 官方接口提交；洛谷只做题面+样例，不碰登录提交（有风控风险）。
 - 🕳 已修坑（别重踩）：
   - Linux：控制台交互输入失效（bash 给裸后台任务接 /dev/null，须显式 `<&3` 从终端读）；Ctrl+C 被继承忽略（用 `trap ':' INT` 而不是 `trap '' INT`）。

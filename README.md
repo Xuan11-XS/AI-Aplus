@@ -56,6 +56,15 @@ cmake --build build
 GXX=/path/to/g++ ./build/aplus
 ```
 
+## 一键启动
+
+```bash
+./aplus.sh
+```
+
+缺依赖会提示；`./aplus.sh --install-deps` 按发行版自动装（要 sudo），`--test` 只跑测试，
+`--rebuild` 强制重编，`--shortcut` 装快捷方式。
+
 ## 快捷方式
 
 ```bash
