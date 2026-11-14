@@ -8,6 +8,11 @@
 #include <QCheckBox>
 #include <QCloseEvent>
 #include <QComboBox>
+#include <QHBoxLayout>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QTextBrowser>
+#include <QVBoxLayout>
 #include <QCoreApplication>
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -189,6 +194,8 @@ void MainWindow::createCentralWidget()
     m_bottomTabs->addTab(m_messages, tr("编译信息"));
     m_bottomTabs->addTab(m_output, tr("运行输出"));
     m_bottomTabs->addTab(m_input, tr("程序输入"));
+
+    createProblemTab();
 
     m_splitter->addWidget(m_editorTabs);
     m_splitter->addWidget(m_bottomTabs);
@@ -440,6 +447,49 @@ void MainWindow::createToolBars()
                 button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         }
     }
+}
+
+void MainWindow::createProblemTab()
+{
+    m_problemTab = new QWidget(m_bottomTabs);
+    auto *layout = new QVBoxLayout(m_problemTab);
+    layout->setContentsMargins(6, 6, 6, 6);
+    layout->setSpacing(6);
+
+    auto *queryRow = new QHBoxLayout;
+    m_problemEdit = new QLineEdit(m_problemTab);
+    m_problemEdit->setPlaceholderText(
+        tr("题号：洛谷 P1001 / 1001，Codeforces 1926C / CF4A"));
+    m_fetchButton = new QPushButton(tr("获取题目"), m_problemTab);
+    queryRow->addWidget(m_problemEdit, 1);
+    queryRow->addWidget(m_fetchButton);
+    layout->addLayout(queryRow);
+
+    m_problemView = new QTextBrowser(m_problemTab);
+    m_problemView->setOpenExternalLinks(true);
+    m_problemView->setPlaceholderText(tr("获取后题面显示在这里。"));
+    layout->addWidget(m_problemView, 1);
+
+    auto *sampleRow = new QHBoxLayout;
+    m_sampleBox = new QComboBox(m_problemTab);
+    m_sampleBox->addItem(tr("（先获取题目）"));
+    m_fillSampleButton = new QPushButton(tr("填入样例"), m_problemTab);
+    m_newFileButton = new QPushButton(tr("新建此题文件"), m_problemTab);
+    sampleRow->addWidget(new QLabel(tr("样例："), m_problemTab));
+    sampleRow->addWidget(m_sampleBox, 1);
+    sampleRow->addWidget(m_fillSampleButton);
+    sampleRow->addWidget(m_newFileButton);
+    layout->addLayout(sampleRow);
+
+    m_bottomTabs->addTab(m_problemTab, tr("题目"));
+
+    m_problemFetcher = new ProblemFetcher(this);
+    connect(m_fetchButton, &QPushButton::clicked, this, &MainWindow::fetchProblem);
+    connect(m_problemEdit, &QLineEdit::returnPressed, this, &MainWindow::fetchProblem);
+    connect(m_problemFetcher, &ProblemFetcher::fetched, this, &MainWindow::onProblemFetched);
+    connect(m_problemFetcher, &ProblemFetcher::failed, this, &MainWindow::onProblemFailed);
+    connect(m_fillSampleButton, &QPushButton::clicked, this, &MainWindow::fillSample);
+    connect(m_newFileButton, &QPushButton::clicked, this, &MainWindow::createProblemFile);
 }
 
 void MainWindow::createStatusBar()
@@ -1392,6 +1442,84 @@ bool MainWindow::isCurrentFile(const QString &path) const
         return false;
     return QDir::cleanPath(QFileInfo(path).absoluteFilePath())
            == QDir::cleanPath(QFileInfo(m_currentPath).absoluteFilePath());
+}
+
+void MainWindow::fetchProblem()
+{
+    const QString query = m_problemEdit->text().trimmed();
+    if (query.isEmpty()) {
+        statusBar()->showMessage(tr("先输入题号"), 3000);
+        return;
+    }
+
+    m_bottomTabs->setCurrentWidget(m_problemTab);
+    m_problemView->setPlainText(tr("正在获取 %1 ...").arg(query));
+    statusBar()->showMessage(tr("正在获取题目 %1 ...").arg(query));
+    m_problemFetcher->fetch(query);
+}
+
+void MainWindow::onProblemFetched(const ProblemFetcher::Problem &problem)
+{
+    m_problem = problem;
+    m_problemView->setHtml(problem.html);
+
+    m_sampleBox->clear();
+    for (int i = 0; i < problem.samples.size(); ++i)
+        m_sampleBox->addItem(tr("样例 #%1").arg(i + 1));
+    if (m_sampleBox->count() == 0)
+        m_sampleBox->addItem(tr("（本题没有样例）"));
+
+    statusBar()->showMessage(tr("已获取 %1 %2（%3 组样例）")
+                                 .arg(problem.id, problem.title)
+                                 .arg(problem.samples.size()));
+}
+
+void MainWindow::onProblemFailed(const QString &message)
+{
+    m_problemView->setPlainText(tr("获取失败：%1").arg(message));
+    statusBar()->showMessage(tr("题目获取失败"), 4000);
+}
+
+void MainWindow::fillSample()
+{
+    const int index = m_sampleBox->currentIndex();
+    if (index < 0 || index >= m_problem.samples.size())
+        return;
+
+    m_input->setPlainText(m_problem.samples.at(index).input);
+    m_bottomTabs->setCurrentWidget(m_input);
+    statusBar()->showMessage(tr("已填入样例 #%1").arg(index + 1), 3000);
+}
+
+void MainWindow::createProblemFile()
+{
+    if (m_problem.id.isEmpty()) {
+        statusBar()->showMessage(tr("先获取一道题"), 3000);
+        return;
+    }
+    if (!maybeSave())
+        return;
+
+    const QString base = (m_problem.oj == QLatin1String("luogu"))
+                             ? m_problem.id
+                             : (QStringLiteral("CF") + m_problem.id);
+    const QString path = workspaceDir() + QLatin1Char('/') + base + QStringLiteral(".cpp");
+
+    if (QFileInfo::exists(path)) {
+        loadFile(path);
+        return;
+    }
+
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        QMessageBox::warning(this, tr("新建失败"), tr("无法创建 %1").arg(path));
+        return;
+    }
+    file.write(kTemplate);
+    file.close();
+
+    loadFile(path);
+    statusBar()->showMessage(tr("已新建 %1.cpp").arg(base), 4000);
 }
 
 void MainWindow::clearMessages()

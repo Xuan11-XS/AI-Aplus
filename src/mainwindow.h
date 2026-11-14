@@ -5,14 +5,19 @@
 #include <QMainWindow>
 
 #include "compilerunner.h"
+#include "problemfetcher.h"
 
 class QAction;
 class QCloseEvent;
+class QComboBox;
 class QLabel;
+class QLineEdit;
 class QPlainTextEdit;
+class QPushButton;
 class QSplitter;
 class QTabWidget;
 class QTableWidget;
+class QTextBrowser;
 class QToolBar;
 class CodeEditor;
 class ConsoleRunner;
@@ -51,12 +56,18 @@ private slots:
     void onRunFinished(int exitCode, bool crashed, bool timedOut, bool stopped, int elapsedMs);
     void onConsoleFinished(int exitCode, bool timedOut, bool stopped, int elapsedMs);
     void onMessageDoubleClicked(int row, int column);
+    void fetchProblem();
+    void onProblemFetched(const ProblemFetcher::Problem &problem);
+    void onProblemFailed(const QString &message);
+    void fillSample();
+    void createProblemFile();
 
 private:
     void createActions();
     void createMenus();
     void createToolBars();
     void createCentralWidget();
+    void createProblemTab();
     void createStatusBar();
     void connectRunner();
     void loadSettings();
@@ -122,6 +133,16 @@ private:
 
     CompileRunner *m_runner = nullptr;
     ConsoleRunner *m_console = nullptr;
+    ProblemFetcher *m_problemFetcher = nullptr;
+
+    QWidget *m_problemTab = nullptr;
+    QLineEdit *m_problemEdit = nullptr;
+    QTextBrowser *m_problemView = nullptr;
+    QComboBox *m_sampleBox = nullptr;
+    QPushButton *m_fetchButton = nullptr;
+    QPushButton *m_fillSampleButton = nullptr;
+    QPushButton *m_newFileButton = nullptr;
+    ProblemFetcher::Problem m_problem;
     CompileRunner::Options m_options;
 
     QString m_currentPath;

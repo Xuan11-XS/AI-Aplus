@@ -10,7 +10,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
-find_package(Qt6 6.2 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 6.2 REQUIRED COMPONENTS Widgets Network)
 
 add_executable(aplus
     src/main.cpp
@@ -24,11 +24,13 @@ add_executable(aplus
     src/compilerunner.h
     src/consolerunner.cpp
     src/consolerunner.h
+    src/problemfetcher.cpp
+    src/problemfetcher.h
     resources.qrc
 )
 
 target_include_directories(aplus PRIVATE src)
-target_link_libraries(aplus PRIVATE Qt6::Widgets)
+target_link_libraries(aplus PRIVATE Qt6::Widgets Qt6::Network)
 target_compile_options(aplus PRIVATE -Wall -Wextra)
 set_target_properties(aplus PROPERTIES WIN32_EXECUTABLE TRUE)
 
@@ -44,4 +46,15 @@ if(APLUS_BUILD_TESTS)
     target_link_libraries(compilerunner_tests PRIVATE Qt6::Core)
     target_compile_options(compilerunner_tests PRIVATE -Wall -Wextra)
     add_test(NAME compilerunner COMMAND compilerunner_tests)
+
+    add_executable(problemfetcher_tests
+        tests/test_problemfetcher.cpp
+        src/problemfetcher.cpp
+        src/problemfetcher.h
+    )
+    target_include_directories(problemfetcher_tests PRIVATE src)
+    target_link_libraries(problemfetcher_tests PRIVATE Qt6::Core Qt6::Network)
+    target_compile_options(problemfetcher_tests PRIVATE -Wall -Wextra)
+    target_compile_definitions(problemfetcher_tests PRIVATE APLUS_TEST_DIR="${CMAKE_SOURCE_DIR}")
+    add_test(NAME problemfetcher COMMAND problemfetcher_tests)
 endif()

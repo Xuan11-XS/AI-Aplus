@@ -1,0 +1,24 @@
+{
+  "code": 200,
+  "currentData": {
+    "problem": {
+      "pid": "P1001",
+      "title": "A+B Problem",
+      "difficulty": 1,
+      "fullScore": 100,
+      "type": "P",
+      "background": "",
+      "description": "<p>输入两个整数 <code>a, b</code>，输出它们的和（<code>|a|,|b| &le; 10<sup>9</sup></code>）。</p>",
+      "inputFormat": "<p>两个以空格分开的整数。</p>",
+      "outputFormat": "<p>一个整数。</p>",
+      "translation": "",
+      "hint": "",
+      "samples": [
+        { "input": "1 2", "output": "3" },
+        { "input": "100 200", "output": "300" }
+      ]
+    },
+    "contest": null
+  },
+  "currentTitle": "P1001 A+B Problem"
+}

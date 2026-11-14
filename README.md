@@ -13,7 +13,8 @@ Aplus 是一个用 C++17 + Qt 6 写的单文件 C++ 编辑器，布局按 Dev-C+
 - 编辑：C++ 语法高亮、行号、当前行高亮、自动缩进、Tab 缩进、`Ctrl+/` 注释、`Ctrl+滚轮` 缩放字号
 - 编译：F9；运行：F10；编译并运行：F11；停止：Ctrl+F2
 - 编译信息用表格显示，双击错误行跳到源码对应位置，出错行标红
-- 运行默认打开独立控制台窗口，程序结束后显示退出码并等按键；也可以切回内嵌输出
+- 运行默认打开独立控制台窗口（Linux 走 GNOME Console 等，Windows 走 PowerShell），程序结束后显示退出码并等按键；也可以切回内嵌输出
+- “题目”标签页：输入洛谷 P1001 / Codeforces 1926C 拉题面和样例，样例一键填入输入框，按题号建文件
 - “程序输入”标签页用来给控制台程序喂 stdin，留空则可以在控制台里手动输入
 - 内嵌输出模式会实时显示 stdout/stderr，stderr 标红
 - 编译选项：C++11/14/17/20/23、-O0 ~ -O3、-Wall、时间限制
@@ -65,6 +66,17 @@ GXX=/path/to/g++ ./build/aplus
 `~/Desktop/Aplus.desktop`。之后在 GNOME 活动里搜索 **Aplus** 就能启动。
 
 快捷方式指向 `build/aplus`，工作目录是项目根目录；项目搬家后重新执行一次脚本即可。
+
+## Ubuntu 上编译运行
+
+```bash
+sudo apt install build-essential cmake ninja-build qt6-base-dev
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+./build/aplus
+```
+
+22.04 / 24.04 都行（Qt >= 6.2），细节见 [docs/UBUNTU.md](docs/UBUNTU.md)。
 
 ## 编译成 Windows exe
 
