@@ -65,7 +65,7 @@ export https_proxy=http://127.0.0.1:7897 http_proxy=http://127.0.0.1:7897
 - ✅ 已做（2026-11-14）：合并 Windows 两笔提交（PowerShell 独立控制台、便携打包脚本，见 docs/WINDOWS.md）；新增“题目”标签页——洛谷/CF 题面+样例获取（洛谷 JSON 接口被风控时自动退回页面内嵌 lentille JSON）、样例一键填入、按题号建文件；新增 docs/UBUNTU.md；新增 aplus.sh 一键启动脚本（检测依赖/自动安装/编译/测试/快捷方式）；其 Qt 检测改为 CMake 探测，修 Ubuntu 上误报缺 Qt6。
 - 💡 计划（用户感兴趣）：本地对拍 → CF 官方接口提交；洛谷只做题面+样例，不碰登录提交（有风控风险）。
 - 🕳 已修坑（别重踩）：
-  - 跨机器：别拷 build/ 目录（Arch 的 Qt 6.12 二进制在 Ubuntu 26.04 的 Qt 6.10 上会报 `Qt_6.12 not found`）；`./aplus.sh --rebuild` 会先清 build/。这不是缺依赖。
+  - 跨机器：别拷 build/ 目录（Arch 的 Qt 6.12 二进制在 Ubuntu 26.04 的 Qt 6.10 上会报 `Qt_6.12 not found`）；`./aplus.sh --rebuild` 会先清 build/；脚本也会自动检测 CMakeCache 的源码路径不匹配并清理。这不是缺依赖。
   - Ubuntu：别用 pkg-config 探测 Qt6（26.04 可能没装 pkg-config，或 .pc 路径不同，会误报“缺 Qt6”）；aplus.sh 已改成用 CMake 探测。
   - Linux：控制台交互输入失效（bash 给裸后台任务接 /dev/null，须显式 `<&3` 从终端读）；Ctrl+C 被继承忽略（用 `trap ':' INT` 而不是 `trap '' INT`）。
   - Windows：`run.ps1` 必须带 UTF-8 BOM 写，PowerShell 5.1 没 BOM 就按 ANSI 读，中文注释会把换行吞掉、脚本直接语法错；启动要带 `-ExecutionPolicy Bypass`；壳进程用 `SetConsoleCtrlHandler(NULL, true)` 忽略 Ctrl+C；PowerShell 5.1 的 `ProcessStartInfo` 没有 `ArgumentList`。

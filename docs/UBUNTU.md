@@ -18,4 +18,5 @@ cmake --build build
 - 快捷方式：`./install-shortcut.sh`，和 Arch 一样装到应用菜单和桌面。
 - 测试：`ctest --test-dir build --output-on-failure`。
 - **不要**把别的机器编好的 `build/` 拷过来（比如 Arch 的 Qt 6.12 二进制在 Ubuntu 的 Qt 6.10 上会报
-  `version 'Qt_6.12' not found`）。换机器后先 `./aplus.sh --rebuild`，它会清掉 build/ 重新编。
+  `version 'Qt_6.12' not found`）。换机器后先 `./aplus.sh --rebuild`，它会清掉 build/ 重新编；
+  脚本也会检测 CMakeCache 里的源码路径和当前目录不一致的情况，自动清理。

@@ -99,10 +99,18 @@ check_deps() {
     fi
 }
 
+# 缓存里的源码路径和当前目录不一致（比如把别的机器的 build/ 拷过来了）
+stale_cache() {
+    [ -f build/CMakeCache.txt ] || return 1
+    local cached_src
+    cached_src="$(sed -n 's|^CMAKE_HOME_DIRECTORY:INTERNAL=||p' build/CMakeCache.txt | head -1)"
+    [ -n "$cached_src" ] && [ "$cached_src" != "$PWD" ]
+}
+
 build() {
     check_deps
-    if [ "$CLEAN_BUILD" = 1 ]; then
-        echo "==> 清理 build/"
+    if [ "$CLEAN_BUILD" = 1 ] || stale_cache; then
+        echo "==> 清理 build/（旧缓存来自别的目录或要求强制重编）"
         rm -rf build
     fi
     if [ ! -f build/CMakeCache.txt ] || [ ! -x build/aplus ]; then
