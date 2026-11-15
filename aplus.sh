@@ -10,7 +10,7 @@ usage() {
 用法: ./aplus.sh [选项]
 
   无参数          检查依赖，需要就编译，然后启动 Aplus
-  --rebuild       强制重新编译
+  --rebuild       删掉 build/ 后重新编译（换机器或换 Qt 版本时用）
   --test          编译并跑一遍 ctest
   --install-deps  按发行版自动安装依赖（需要 sudo）
   --shortcut      安装/更新桌面快捷方式（调 install-shortcut.sh）
@@ -18,12 +18,12 @@ usage() {
 EOF
 }
 
-FORCE_REBUILD=0
+CLEAN_BUILD=0
 ACTION=run
 
 while [ $# -gt 0 ]; do
     case "$1" in
-        --rebuild) FORCE_REBUILD=1 ;;
+        --rebuild) CLEAN_BUILD=1 ;;
         --test) ACTION=test ;;
         --install-deps) ACTION=install-deps ;;
         --shortcut) ACTION=shortcut ;;
@@ -101,7 +101,11 @@ check_deps() {
 
 build() {
     check_deps
-    if [ "$FORCE_REBUILD" = 1 ] || [ ! -f build/CMakeCache.txt ] || [ ! -x build/aplus ]; then
+    if [ "$CLEAN_BUILD" = 1 ]; then
+        echo "==> 清理 build/"
+        rm -rf build
+    fi
+    if [ ! -f build/CMakeCache.txt ] || [ ! -x build/aplus ]; then
         echo "==> 配置编译环境"
         cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
     fi

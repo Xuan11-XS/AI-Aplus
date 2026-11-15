@@ -63,7 +63,7 @@ GXX=/path/to/g++ ./build/aplus
 ```
 
 缺依赖会提示；`./aplus.sh --install-deps` 按发行版自动装（要 sudo），`--test` 只跑测试，
-`--rebuild` 强制重编，`--shortcut` 装快捷方式。
+`--rebuild` 删掉 build/ 重新编译（换机器/换 Qt 版本时用），`--shortcut` 装快捷方式。
 
 ## 快捷方式
 
