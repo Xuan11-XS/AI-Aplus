@@ -43,12 +43,32 @@ detect_distro() {
     fi
 }
 
+# 用 CMake 直接探 Qt6：和真正编译用的是同一套检测，
+# 不依赖 pkg-config（Ubuntu 上 pkg-config 可能没装，或 .pc 路径不同，会误报）
+qt_ok() {
+    local dir
+    dir="$(mktemp -d)" || return 1
+    cat > "$dir/CMakeLists.txt" <<'EOF'
+cmake_minimum_required(VERSION 3.16)
+project(aplus_qt_probe LANGUAGES CXX)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Network)
+EOF
+    if cmake -S "$dir" -B "$dir/build" >/dev/null 2>&1; then
+        rm -rf "$dir"
+        return 0
+    fi
+    rm -rf "$dir"
+    return 1
+}
+
 missing_deps() {
     local missing=()
     command -v g++ >/dev/null 2>&1 || missing+=(g++)
     command -v cmake >/dev/null 2>&1 || missing+=(cmake)
     command -v ninja >/dev/null 2>&1 || missing+=(ninja)
-    pkg-config --exists Qt6Widgets Qt6Network 2>/dev/null || missing+=(Qt6)
+    if command -v cmake >/dev/null 2>&1 && ! qt_ok; then
+        missing+=("qt6-base-dev（Qt6 Widgets/Network 开发包）")
+    fi
     printf '%s\n' "${missing[@]}"
 }
 
@@ -60,7 +80,7 @@ install_deps() {
             sudo pacman -S --needed base-devel cmake ninja qt6-base
             ;;
         ubuntu)
-            sudo apt-get install -y build-essential cmake ninja-build qt6-base-dev
+            sudo apt-get install -y build-essential cmake ninja-build pkg-config qt6-base-dev
             ;;
         *)
             echo "认不出这个发行版。手动装齐：g++、cmake、ninja，以及 Qt6 Widgets/Network 开发包。" >&2
